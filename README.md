@@ -17,6 +17,6 @@ samples, guidance on mobile development, and a full API reference.
 
 ### TO DO
 - Desktop Application
-- Connection Panel_ config listtile
-- Hide/Show Tabbar icon_btn the end of tab
+- Connection Panel State
+- Ribbon State
 - analysis scalable on ribbon group

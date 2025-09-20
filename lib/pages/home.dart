@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import '../providers/home_provider.dart';
 import '../providers/theme_provider.dart';
+import '../providers/ribbon_provider.dart';
 
 class Home extends StatefulWidget {
   const Home({super.key});
@@ -11,16 +11,20 @@ class Home extends StatefulWidget {
 }
 
 class _HomeState extends State<Home> {
+  final tabs = ["Navigation", "Mapping", "WayPoints", "License", "Settings"];
+
   @override
   Widget build(BuildContext context) {
-    return DefaultTabController(
-      length: 5, // Ribbon tabs
-      child: Consumer<ThemeProvider>(
-        builder: (context, themeProvider, child) {
-          return Scaffold(
-            backgroundColor: themeProvider.isDarkMode 
-                ? Colors.grey[900] 
-                : Colors.grey[100],
+    return Consumer2<ThemeProvider, RibbonStateProvider>(
+      builder: (context, themeProvider, ribbonState, child) {
+        return DefaultTabController(
+          length: tabs.length,
+          initialIndex: ribbonState.selectedTab,
+          child: Scaffold(
+            backgroundColor:
+                themeProvider.isDarkMode ? Colors.grey[900] : Colors.grey[100],
+
+            // ===== AppBar with Tabs and Ribbon Toggle =====
             appBar: AppBar(
               toolbarHeight: 45,
               title: Row(
@@ -33,12 +37,15 @@ class _HomeState extends State<Home> {
                   ),
                   const Spacer(),
                   IconButton(
-                    tooltip: "Toggle Theme",
+                    tooltip: themeProvider.isDarkMode
+                        ? "Switch to Light Mode"
+                        : "Switch to Dark Mode",
                     icon: Icon(
                       themeProvider.isDarkMode
                           ? Icons.dark_mode
                           : Icons.light_mode,
-                      color: Colors.white,
+                      color:
+                          themeProvider.isDarkMode ? Colors.white : Colors.black,
                     ),
                     onPressed: () {
                       themeProvider.toggleTheme();
@@ -46,132 +53,122 @@ class _HomeState extends State<Home> {
                   ),
                 ],
               ),
-              
-              bottom:  PreferredSize(
-                preferredSize: const Size.fromHeight(30.0),
+
+              // Bottom: Tabs Row + Ribbon Toggle
+              bottom: PreferredSize(
+                preferredSize: const Size.fromHeight(30),
                 child: Row(
                   children: [
-                    const SizedBox(width: 20),
-                    Consumer<HomeStateProvider>(
-                      builder: (context, homeState, child) {
-                        return IconButton(
-                          tooltip: "Robot Connections",
-                          icon: Icon(
-                            Icons.add_link,
-                            color: themeProvider.isDarkMode 
-                                ? Colors.white 
-                                : Colors.black,
-                          ),
-                          onPressed: () {
-                            homeState.toggleConnectionPanel();
-                          },
-                        );
-                      }
+                    const SizedBox(width: 10),
+                    // Robot connection icon
+                    IconButton(
+                      tooltip: "Robot Connections",
+                      icon: Icon(
+                        Icons.add_link,
+                        color: themeProvider.isDarkMode
+                            ? Colors.white
+                            : Colors.black,
+                      ),
+                      onPressed: () {
+                        ribbonState.toggleConnectionPanel();
+                      },
                     ),
+                    const SizedBox(width: 8),
+                    // Tabs
                     Expanded(
-                      child: Consumer<HomeStateProvider>(
-                        builder: (context, homeState, child) {
-                          return TabBar(
-                            isScrollable: true,
-                            indicatorColor: themeProvider.isDarkMode 
-                                ? Colors.white 
-                                : Colors.black,
-                            labelColor: themeProvider.isDarkMode 
-                                ? Colors.white 
-                                : Colors.black,
-                            unselectedLabelColor: themeProvider.isDarkMode 
-                                ? Colors.white70 
-                                : Colors.black54,
-                            onTap: (index) {
-                              homeState.setSelectedTab(index);
-                            },
-                            tabs: const [
-                              Tab(text: "Navigation"),
-                              Tab(text: "Mapping"),
-                              Tab(text: "WayPoints"),
-                              Tab(text: "License"),
-                              Tab(text: "Settings"),
-                            ],
-                          );
-                        }
+                      child: TabBar(
+                        isScrollable: true,
+                        onTap: (index) {
+                          ribbonState.setSelectedTab(index);
+                        },
+                        indicator: BoxDecoration(
+                          color: ribbonState.showRibbon
+                              ? Colors.blueAccent.withOpacity(0.2)
+                              : Colors.transparent,
+                          borderRadius: BorderRadius.circular(6),
+                        ),
+                        labelColor: Colors.blueAccent,
+                        unselectedLabelColor: themeProvider.isDarkMode
+                            ? Colors.white70
+                            : Colors.black54,
+                        tabs: tabs.map((name) => Tab(text: name)).toList(),
                       ),
                     ),
+                    // Ribbon toggle
+                    IconButton(
+                      tooltip: ribbonState.showRibbon ? "Hide Ribbon" : "Show Ribbon",
+                      icon: Icon(
+                        ribbonState.showRibbon
+                            ? Icons.keyboard_arrow_up
+                            : Icons.keyboard_arrow_down,
+                        color:
+                            themeProvider.isDarkMode ? Colors.white : Colors.black,
+                      ),
+                      onPressed: () {
+                        ribbonState.toggleRibbon();
+                      },
+                    ),
+                    const SizedBox(width: 8),
                   ],
                 ),
               ),
             ),
+
+            // ===== Body =====
             body: Column(
               children: [
-                // Ribbon actions (changes by selected tab) - stays fixed at top
-                SizedBox(
-                  height: 70,
-                  child: Consumer<HomeStateProvider>(
-                    builder: (context, homeState, child) {
-                      return _buildRibbonContent(homeState.selectedTab);
-                    }
+                // Ribbon content (dynamic based on selected tab)
+                if (ribbonState.showRibbon)
+                  SizedBox(
+                    height: 70,
+                    child: _buildRibbonContent(ribbonState.selectedTab),
                   ),
-                ),
 
-                // Main content area - mapping space with connection panel
+                // Main content: Mapping / Localization
                 Expanded(
-                  child: Consumer<HomeStateProvider>(
-                    builder: (context, homeState, child) {
-                      return Row(
-                        children: [
-                          // Connection panel (shown/hidden based on state)
-                          homeState.showConnectionPanel
-                              ? Container(
-                                  width: 250, // Adjust width as needed
-                                  child: Consumer<ThemeProvider>(
-                                    builder: (context, themeProvider, child) {
-                                      return Container(
-                                        color: themeProvider.isDarkMode 
-                                            ? Colors.blueGrey[900] 
-                                            : Colors.blueGrey[100],
-                                        child: const Center(
-                                          child: Text(
-                                            "Connection Panel Content",
-                                            style: TextStyle(fontSize: 16),
-                                          ),
-                                        ),
-                                      );
-                                    }
-                                  ),
-                                )
-                              : const SizedBox.shrink(),
-                          // Mapping area - gets pushed to the right when panel is shown
-                          Expanded(
-                            child: Consumer<ThemeProvider>(
-                              builder: (context, themeProvider, child) {
-                                return Container(
-                                  color: themeProvider.isDarkMode 
-                                      ? Colors.black87 
-                                      : Colors.black12,
-                                  child: const Center(
-                                    child: Text(
-                                      "Mapping / Localization Space",
-                                      style: TextStyle(
-                                          fontSize: 20, fontWeight: FontWeight.bold),
-                                    ),
-                                  ),
-                                );
-                              }
+                  child: Row(
+                    children: [
+                      // Connection panel
+                      if (ribbonState.showConnectionPanel)
+                        Container(
+                          width: 250,
+                          color: themeProvider.isDarkMode
+                              ? Colors.blueGrey[900]
+                              : Colors.blueGrey[100],
+                          child: const Center(
+                            child: Text(
+                              "Connection Panel Content",
+                              style: TextStyle(fontSize: 16),
                             ),
                           ),
-                        ],
-                      );
-                    }
+                        ),
+                      // Mapping space
+                      Expanded(
+                        child: Container(
+                          color: themeProvider.isDarkMode
+                              ? Colors.black87
+                              : Colors.black12,
+                          child: const Center(
+                            child: Text(
+                              "Mapping / Localization Space",
+                              style: TextStyle(
+                                  fontSize: 20, fontWeight: FontWeight.bold),
+                            ),
+                          ),
+                        ),
+                      ),
+                    ],
                   ),
                 ),
               ],
             ),
-          );
-        }
-      ),
+          ),
+        );
+      },
     );
   }
 
-  // Build ribbon content based on tab
+  // ===== Ribbon content builder =====
   Widget _buildRibbonContent(int tabIndex) {
     switch (tabIndex) {
       case 0:
@@ -187,7 +184,7 @@ class _HomeState extends State<Home> {
           _buildRibbonButton(Icons.format_underline, "Underline"),
         ]);
       case 2:
-        return _buildRibbonGroup( [
+        return _buildRibbonGroup([
           _buildRibbonButton(Icons.zoom_in, "Zoom In"),
           _buildRibbonButton(Icons.zoom_out, "Zoom Out"),
           _buildRibbonButton(Icons.fullscreen, "Full Screen"),
@@ -197,7 +194,6 @@ class _HomeState extends State<Home> {
     }
   }
 
-  // Ribbon group container
   Widget _buildRibbonGroup(List<Widget> buttons) {
     return Card(
       elevation: 2,
@@ -206,36 +202,27 @@ class _HomeState extends State<Home> {
         builder: (context, themeProvider, child) {
           return Container(
             decoration: BoxDecoration(
-              color: themeProvider.isDarkMode 
-                  ? Colors.grey[800] 
-                  : Colors.white,
+              color: themeProvider.isDarkMode ? Colors.grey[800] : Colors.white,
               borderRadius: BorderRadius.circular(4),
             ),
             child: Padding(
               padding: const EdgeInsets.all(8.0),
-              child: Column(
-                children: [
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.start,
-                    children: buttons,
-                  ),
-                ],
+              child: Row(
+                children: buttons,
               ),
             ),
           );
-        }
+        },
       ),
     );
   }
 
-  // Ribbon button
   Widget _buildRibbonButton(IconData icon, String label) {
     return Consumer<ThemeProvider>(
       builder: (context, themeProvider, child) {
         return InkWell(
           onTap: () {
-            debugPrint("$label action executed in Mapping/Localization!");
-            // TODO: connect action with map/localization logic
+            debugPrint("$label action executed!");
           },
           child: Padding(
             padding: const EdgeInsets.symmetric(horizontal: 12.0),
@@ -243,26 +230,22 @@ class _HomeState extends State<Home> {
               mainAxisSize: MainAxisSize.min,
               children: [
                 Icon(
-                  icon, 
-                  size: 28.0,
-                  color: themeProvider.isDarkMode 
-                      ? Colors.white 
-                      : Colors.black,
+                  icon,
+                  size: 28,
+                  color: themeProvider.isDarkMode ? Colors.white : Colors.black,
                 ),
                 Text(
-                  label, 
+                  label,
                   style: TextStyle(
                     fontSize: 10,
-                    color: themeProvider.isDarkMode 
-                        ? Colors.white 
-                        : Colors.black,
+                    color: themeProvider.isDarkMode ? Colors.white : Colors.black,
                   ),
                 ),
               ],
             ),
           ),
         );
-      }
+      },
     );
   }
 }
