@@ -16,7 +16,5 @@ For help getting started with Flutter development, view the
 samples, guidance on mobile development, and a full API reference.
 
 ### TO DO
-- Desktop Application
 - Connection Panel State
-- Ribbon State
-- analysis scalable on ribbon group
+- study map widget style - as a free moveable layer not depend as home's widget.

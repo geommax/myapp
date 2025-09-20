@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../providers/theme_provider.dart';
 import '../providers/ribbon_provider.dart';
+import '../pages/map.dart';
+import '../pages/ribbon_content.dart';
 
 class Home extends StatefulWidget {
   const Home({super.key});
@@ -11,7 +13,7 @@ class Home extends StatefulWidget {
 }
 
 class _HomeState extends State<Home> {
-  final tabs = ["Navigation", "Mapping", "WayPoints", "License", "Settings"];
+  final tabs = ["Navigation", "Mapping", "WayPoints", "Wall", "About"];
 
   @override
   Widget build(BuildContext context) {
@@ -79,19 +81,35 @@ class _HomeState extends State<Home> {
                       child: TabBar(
                         isScrollable: true,
                         onTap: (index) {
-                          ribbonState.setSelectedTab(index);
+                          ribbonState.toggleTab(index);
                         },
                         indicator: BoxDecoration(
-                          color: ribbonState.showRibbon
-                              ? Colors.blueAccent.withOpacity(0.2)
+                          color:ribbonState.showRibbon ? 
+                              (themeProvider.isDarkMode
+                                  ? Colors.blueGrey[700]
+                                  : Colors.blueGrey[300])
                               : Colors.transparent,
                           borderRadius: BorderRadius.circular(6),
                         ),
-                        labelColor: Colors.blueAccent,
+                        indicatorSize: TabBarIndicatorSize.tab,
+                        labelColor: ribbonState.showRibbon ?
+                            (themeProvider.isDarkMode
+                                ? Colors.white
+                                : Colors.black)
+                            : (themeProvider.isDarkMode
+                                ? Colors.white70
+                                : Colors.black54),
                         unselectedLabelColor: themeProvider.isDarkMode
                             ? Colors.white70
                             : Colors.black54,
-                        tabs: tabs.map((name) => Tab(text: name)).toList(),
+                        tabs: tabs
+                            .map(
+                              (name) => SizedBox(
+                                width: 100, // fixed width for all tabs
+                                child: Tab(text: name),
+                              ),
+                            )
+                            .toList(),
                       ),
                     ),
                     // Ribbon toggle
@@ -100,7 +118,8 @@ class _HomeState extends State<Home> {
                       icon: Icon(
                         ribbonState.showRibbon
                             ? Icons.keyboard_arrow_up
-                            : Icons.keyboard_arrow_down,
+                            : Icons.keyboard_arrow_left,
+                        
                         color:
                             themeProvider.isDarkMode ? Colors.white : Colors.black,
                       ),
@@ -120,8 +139,9 @@ class _HomeState extends State<Home> {
                 // Ribbon content (dynamic based on selected tab)
                 if (ribbonState.showRibbon)
                   SizedBox(
-                    height: 70,
-                    child: _buildRibbonContent(ribbonState.selectedTab),
+                    height: 60,
+                    //child: _buildRibbonContent(ribbonState.selectedTab),
+                    child: RibbonContent(selectedTab: ribbonState.selectedTab),
                   ),
 
                 // Main content: Mapping / Localization
@@ -144,101 +164,9 @@ class _HomeState extends State<Home> {
                         ),
                       // Mapping space
                       Expanded(
-                        child: Container(
-                          color: themeProvider.isDarkMode
-                              ? Colors.black87
-                              : Colors.black12,
-                          child: const Center(
-                            child: Text(
-                              "Mapping / Localization Space",
-                              style: TextStyle(
-                                  fontSize: 20, fontWeight: FontWeight.bold),
-                            ),
-                          ),
-                        ),
+                        child: MapPage(),
                       ),
                     ],
-                  ),
-                ),
-              ],
-            ),
-          ),
-        );
-      },
-    );
-  }
-
-  // ===== Ribbon content builder =====
-  Widget _buildRibbonContent(int tabIndex) {
-    switch (tabIndex) {
-      case 0:
-        return _buildRibbonGroup([
-          _buildRibbonButton(Icons.content_copy, "Copy"),
-          _buildRibbonButton(Icons.cut, "Cut"),
-          _buildRibbonButton(Icons.paste, "Paste"),
-        ]);
-      case 1:
-        return _buildRibbonGroup([
-          _buildRibbonButton(Icons.format_bold, "Bold"),
-          _buildRibbonButton(Icons.format_italic, "Italic"),
-          _buildRibbonButton(Icons.format_underline, "Underline"),
-        ]);
-      case 2:
-        return _buildRibbonGroup([
-          _buildRibbonButton(Icons.zoom_in, "Zoom In"),
-          _buildRibbonButton(Icons.zoom_out, "Zoom Out"),
-          _buildRibbonButton(Icons.fullscreen, "Full Screen"),
-        ]);
-      default:
-        return const SizedBox();
-    }
-  }
-
-  Widget _buildRibbonGroup(List<Widget> buttons) {
-    return Card(
-      elevation: 2,
-      margin: const EdgeInsets.symmetric(horizontal: 40, vertical: 6),
-      child: Consumer<ThemeProvider>(
-        builder: (context, themeProvider, child) {
-          return Container(
-            decoration: BoxDecoration(
-              color: themeProvider.isDarkMode ? Colors.grey[800] : Colors.white,
-              borderRadius: BorderRadius.circular(4),
-            ),
-            child: Padding(
-              padding: const EdgeInsets.all(8.0),
-              child: Row(
-                children: buttons,
-              ),
-            ),
-          );
-        },
-      ),
-    );
-  }
-
-  Widget _buildRibbonButton(IconData icon, String label) {
-    return Consumer<ThemeProvider>(
-      builder: (context, themeProvider, child) {
-        return InkWell(
-          onTap: () {
-            debugPrint("$label action executed!");
-          },
-          child: Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 12.0),
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Icon(
-                  icon,
-                  size: 28,
-                  color: themeProvider.isDarkMode ? Colors.white : Colors.black,
-                ),
-                Text(
-                  label,
-                  style: TextStyle(
-                    fontSize: 10,
-                    color: themeProvider.isDarkMode ? Colors.white : Colors.black,
                   ),
                 ),
               ],

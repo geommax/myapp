@@ -4,38 +4,31 @@ class RibbonStateProvider with ChangeNotifier {
   // Global State variables
   bool _showRibbon = false;
   int _selectedTab = 0;
-  int? _highlightedTab; 
   bool _showConnectionPanel = false;
 
   // Getters
   int get selectedTab => _selectedTab;
   bool get showRibbon => _showRibbon;
   bool get showConnectionPanel => _showConnectionPanel;
-  int? get highlightedTab => _highlightedTab;
 
     /// Toggle ribbon visibility
-  void setSelectedTab(int index) {
-    _selectedTab = index;
-    _highlightedTab = index;
-    _showRibbon = true; 
+  void toggleTab(int index) {
+    if (_selectedTab == index) {
+      // Same tab clicked again → toggle ribbon
+      _showRibbon = !_showRibbon;
+    } else {
+      // New tab clicked → select and always show ribbon
+      _selectedTab = index;
+      _showRibbon = true;
+    }
     notifyListeners();
   }
 
-  void clearHighlight() {
-    _highlightedTab = null;
-    notifyListeners();
-  }
-void toggleRibbon() {
+  void toggleRibbon() {
     if (_showRibbon) {
-      // hide ribbon
       _showRibbon = false;
-      _highlightedTab = null; // clear highlight
     } else {
-      // show ribbon, highlight first tab if nothing selected
-      if (_selectedTab == null) {
-        _selectedTab = 0;
-      }
-      _highlightedTab = _selectedTab;
+      _showRibbon = true;
     }
     notifyListeners();
   }
