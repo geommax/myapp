@@ -16,5 +16,17 @@ For help getting started with Flutter development, view the
 samples, guidance on mobile development, and a full API reference.
 
 ### TO DO
-- Connection Panel State
+- Connection Panel State => Connection Status (green/red) => Setting double click on RobotA,B- Wrap Container to control freely
 - study map widget style - as a free moveable layer not depend as home's widget.
+- Global App state (Cache) to get back previous state on application startup 
+- To Add menu of Ribbon Contents.
+
+### Troubleshoot
+
+```bash
+flutter config --list
+```
+
+```bash
+flutter config --enable-linux-desktop
+```

@@ -3,6 +3,7 @@ import 'package:provider/provider.dart';
 
 import 'providers/theme_provider.dart';
 import 'providers/ribbon_provider.dart';
+import 'providers/conn_explorer_provider.dart';
 
 import 'pages/startup.dart';
 import 'pages/home.dart';
@@ -13,6 +14,7 @@ void main() {
       providers: [
         ChangeNotifierProvider(create: (context) => ThemeProvider()),
         ChangeNotifierProvider(create: (context) => RibbonStateProvider()),
+        ChangeNotifierProvider(create: (context) => ConnExplorerPanelStateProvider()),
       ],
       child: MyApp(),
     ),

@@ -4,6 +4,8 @@ import '../providers/theme_provider.dart';
 import '../providers/ribbon_provider.dart';
 import '../pages/map.dart';
 import '../pages/ribbon_content.dart';
+import '../pages/conn_explorer_panel.dart';
+import '../providers/conn_explorer_provider.dart';
 
 class Home extends StatefulWidget {
   const Home({super.key});
@@ -14,26 +16,29 @@ class Home extends StatefulWidget {
 
 class _HomeState extends State<Home> {
   final tabs = ["Navigation", "Mapping", "WayPoints", "Wall", "About"];
+  
 
   @override
   Widget build(BuildContext context) {
     return Consumer2<ThemeProvider, RibbonStateProvider>(
       builder: (context, themeProvider, ribbonState, child) {
+        final Color appbarBackground = themeProvider.colors.appbarBackground;
+        final Color ribbonbarBackground = themeProvider.colors.ribbonbarBackground;
+        final Color iconColor = themeProvider.colors.iconColor;
+        final Color tabSelected = themeProvider.colors.tabSelected;
+        final Color selectedLabelColor = themeProvider.colors.selectedLabelColor;
+        final Color unselectedLabelColor = themeProvider.colors.unselectedLabelColor;
+
         return DefaultTabController(
           length: tabs.length,
           initialIndex: ribbonState.selectedTab,
           child: Scaffold(
-            backgroundColor: themeProvider.isDarkMode
-                ? Colors.grey[900]
-                : Colors.grey[100],
             body: Column(
               children: [
                 Container(
                   height: 30,
                   padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 0),
-                  color: themeProvider.isDarkMode
-                      ? Colors.blueGrey[900]
-                      : Colors.blueGrey[100],
+                  color: appbarBackground,
                   child: Row(
                     children: [
                       const Icon(Icons.smart_toy, size: 18),
@@ -51,9 +56,7 @@ class _HomeState extends State<Home> {
                         tooltip: "Update Available",
                         icon: Icon(
                           Icons.update_rounded,
-                          color: themeProvider.isDarkMode
-                              ? Colors.white
-                              : Colors.black,
+                          color: iconColor,
                         ),
                         onPressed: () {
                           showAboutDialog(
@@ -76,9 +79,7 @@ class _HomeState extends State<Home> {
                           themeProvider.isDarkMode
                               ? Icons.dark_mode
                               : Icons.light_mode,
-                          color: themeProvider.isDarkMode
-                              ? Colors.white
-                              : Colors.black,
+                          color: iconColor,
                         ),
                         onPressed: () {
                           themeProvider.toggleTheme();
@@ -91,23 +92,18 @@ class _HomeState extends State<Home> {
                 // Tabs Row + Ribbon Toggle
                 Container(
                   height: 45,
-                  color: themeProvider.isDarkMode
-                      ? Colors.blueGrey[800]
-                      : Colors.blueGrey[200],
+                  color: ribbonbarBackground,
                   child: Row(
                     children: [
                       const SizedBox(width: 10),
-                      IconButton(
-                        tooltip: "Robot Connections",
-                        icon: Icon(
-                          Icons.add_link,
-                          color: themeProvider.isDarkMode
-                              ? Colors.white
-                              : Colors.black,
+                      Consumer<ConnExplorerPanelStateProvider>(
+                        builder: (context, explorerState, _) => IconButton(
+                          tooltip: "Connections",
+                          icon: Icon(Icons.add_link, color: iconColor),
+                          onPressed: () {
+                            explorerState.toggleExplorerPanel();
+                          },
                         ),
-                        onPressed: () {
-                          ribbonState.toggleConnectionPanel();
-                        },
                       ),
                       const SizedBox(width: 8),
                       // Tabs
@@ -119,23 +115,15 @@ class _HomeState extends State<Home> {
                           },
                           indicator: BoxDecoration(
                             color: ribbonState.showRibbon
-                                ? (themeProvider.isDarkMode
-                                    ? Colors.blueGrey[700]
-                                    : Colors.blueGrey[300])
+                                ? (tabSelected)
                                 : Colors.transparent,
                             borderRadius: BorderRadius.circular(6),
                           ),
                           indicatorSize: TabBarIndicatorSize.tab,
                           labelColor: ribbonState.showRibbon
-                              ? (themeProvider.isDarkMode
-                                  ? Colors.white
-                                  : Colors.black)
-                              : (themeProvider.isDarkMode
-                                  ? Colors.white70
-                                  : Colors.black54),
-                          unselectedLabelColor: themeProvider.isDarkMode
-                              ? Colors.white70
-                              : Colors.black54,
+                              ? (selectedLabelColor)
+                              : (unselectedLabelColor),
+                          unselectedLabelColor: unselectedLabelColor,
                           tabs: tabs
                               .map(
                                 (name) => SizedBox(
@@ -152,7 +140,7 @@ class _HomeState extends State<Home> {
                           ribbonState.showRibbon
                               ? Icons.keyboard_arrow_up
                               : Icons.keyboard_arrow_down,
-                          color: themeProvider.isDarkMode ? Colors.white : Colors.black,
+                          color: iconColor,
                         ),
                         onPressed: () {
                           ribbonState.toggleRibbon();
@@ -172,19 +160,15 @@ class _HomeState extends State<Home> {
                 Expanded(
                   child: Row(
                     children: [
-                      if (ribbonState.showConnectionPanel)
-                        Container(
-                          width: 250,
-                          color: themeProvider.isDarkMode
-                              ? Colors.blueGrey[900]
-                              : Colors.blueGrey[100],
-                          child: const Center(
-                            child: Text(
-                              "Connection Panel Content",
-                              style: TextStyle(fontSize: 16),
-                            ),
+                      Consumer<ConnExplorerPanelStateProvider>(
+                        builder: (context, connExplorerState, _) => Visibility(
+                          visible: connExplorerState.showExplorerPanel,
+                          child: SizedBox(
+                            width: 250,
+                            child: ConnExplorerPanel(),
                           ),
                         ),
+                      ),
                       Expanded(
                         child: MapPage(),
                       ),
