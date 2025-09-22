@@ -4,12 +4,12 @@ class RibbonStateProvider with ChangeNotifier {
   // Global State variables
   bool _showRibbon = false;
   int _selectedTab = 0;
-  bool _showExplorerPanel = false;
+
 
   // Getters
   int get selectedTab => _selectedTab;
   bool get showRibbon => _showRibbon;
-  bool get showExplorerPanel => _showExplorerPanel;
+
 
     /// Toggle ribbon visibility
   void toggleTab(int index) {

@@ -16,15 +16,8 @@ class _ConnExplorerPanelState extends State<ConnExplorerPanel> {
   Widget build(BuildContext context) {
   return Consumer2<ThemeProvider, ConnExplorerPanelStateProvider>(
   builder: (context, themeProvider, connExplorerState, child) {
-    final Color appbarBackground = themeProvider.colors.appbarBackground;
-    final Color ribbonbarBackground = themeProvider.colors.ribbonbarBackground;
-    final Color iconColor = themeProvider.colors.iconColor;
-    final Color defaultLabelColor = themeProvider.colors.defaultLabelColor;
-    final Color subLabelColor = themeProvider.colors.subLabelColor;
-    final Color subIconColor = themeProvider.colors.subIconColor;
-
     return Container(
-      color: appbarBackground,
+      color: themeProvider.colors.appbarBackground,
       child: ListView(
         padding: const EdgeInsets.all(8),
         children: [
@@ -32,7 +25,7 @@ class _ConnExplorerPanelState extends State<ConnExplorerPanel> {
           Container(
             height: 26,
             width: double.infinity,
-            color: ribbonbarBackground,
+            color: themeProvider.colors.ribbonbarBackground,
             padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 0),
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -42,7 +35,7 @@ class _ConnExplorerPanelState extends State<ConnExplorerPanel> {
                   style: TextStyle(
                     fontSize: 12,
                     fontWeight: FontWeight.normal,
-                    color: subLabelColor,
+                    color: themeProvider.colors.subLabelColor,
                   ),
                 ),
                 
@@ -51,7 +44,7 @@ class _ConnExplorerPanelState extends State<ConnExplorerPanel> {
                   tooltip: "Collapse Panel",
                   icon: Icon(
                     Icons.close_fullscreen_outlined,
-                    color: subIconColor,
+                    color: themeProvider.colors.subIconColor,
                   ),
                   onPressed: () {
                     connExplorerState.toggleExplorerPanel();
@@ -65,13 +58,13 @@ class _ConnExplorerPanelState extends State<ConnExplorerPanel> {
 
           ExpansionTile(
             key: const PageStorageKey("Robots"),
-            leading: Icon(Icons.smart_toy, color: iconColor),
-            title: Text('Robots', style: TextStyle(color: defaultLabelColor)),
+            leading: Icon(Icons.smart_toy, color: themeProvider.colors.iconColor),
+            title: Text('Robots', style: TextStyle(color: themeProvider.colors.defaultLabelColor)),
             trailing: Row(
               mainAxisSize: MainAxisSize.min,
               children: [
                 IconButton(
-                  icon: Icon(Icons.add, color: iconColor),
+                  icon: Icon(Icons.add, color: themeProvider.colors.iconColor),
                   tooltip: "Add Robot",
                   onPressed: () {
                     showAboutDialog(
@@ -89,7 +82,7 @@ class _ConnExplorerPanelState extends State<ConnExplorerPanel> {
                   connExplorerState.robotsExpanded
                       ? Icons.expand_less
                       : Icons.expand_more,
-                  color: iconColor,
+                  color: themeProvider.colors.iconColor,
                 ),
               ],
             ),
@@ -105,13 +98,13 @@ class _ConnExplorerPanelState extends State<ConnExplorerPanel> {
           ),
           ExpansionTile(
             key: const PageStorageKey("Lasers"),
-            leading: Icon(Icons.image, color: iconColor),
-            title: Text('Lasers', style: TextStyle(color: defaultLabelColor)),
+            leading: Icon(Icons.image, color: themeProvider.colors.iconColor),
+            title: Text('Lasers', style: TextStyle(color: themeProvider.colors.defaultLabelColor)),
             trailing: Row(
               mainAxisSize: MainAxisSize.min,
               children: [
                 IconButton(
-                  icon: Icon(Icons.add, color: iconColor),
+                  icon: Icon(Icons.add, color: themeProvider.colors.iconColor),
                   tooltip: "Add Laser",
                   onPressed: () {
                     showAboutDialog(
@@ -129,7 +122,7 @@ class _ConnExplorerPanelState extends State<ConnExplorerPanel> {
                   connExplorerState.lasersExpanded
                       ? Icons.expand_less
                       : Icons.expand_more,
-                  color: iconColor,
+                  color: themeProvider.colors.iconColor,
                 ),
               ],
             ),

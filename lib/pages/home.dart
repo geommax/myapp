@@ -17,18 +17,23 @@ class Home extends StatefulWidget {
 class _HomeState extends State<Home> {
   final tabs = ["Navigation", "Mapping", "WayPoints", "Wall", "About"];
   
+  Widget datetimeWidget() {
+    final now = DateTime.now();
+    final formatted = "${now.year}-${now.month.toString().padLeft(2, '0')}-${now.day.toString().padLeft(2, '0')} "
+        "${now.hour.toString().padLeft(2, '0')}:${now.minute.toString().padLeft(2, '0')}";
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 8.0),
+      child: Text(
+        formatted,
+        style: const TextStyle(fontSize: 12),
+      ),
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
     return Consumer2<ThemeProvider, RibbonStateProvider>(
       builder: (context, themeProvider, ribbonState, child) {
-        final Color appbarBackground = themeProvider.colors.appbarBackground;
-        final Color ribbonbarBackground = themeProvider.colors.ribbonbarBackground;
-        final Color iconColor = themeProvider.colors.iconColor;
-        final Color tabSelected = themeProvider.colors.tabSelected;
-        final Color selectedLabelColor = themeProvider.colors.selectedLabelColor;
-        final Color unselectedLabelColor = themeProvider.colors.unselectedLabelColor;
-
         return DefaultTabController(
           length: tabs.length,
           initialIndex: ribbonState.selectedTab,
@@ -36,11 +41,12 @@ class _HomeState extends State<Home> {
             body: Column(
               children: [
                 Container(
-                  height: 30,
-                  padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 0),
-                  color: appbarBackground,
+                  height: 26,
+                  padding: const EdgeInsets.symmetric(horizontal: 0, vertical: 0),
+                  color: themeProvider.colors.appbarBackground,
                   child: Row(
                     children: [
+                      const SizedBox(width: 8),
                       const Icon(Icons.smart_toy, size: 18),
                       const SizedBox(width: 6),
                       const Text(
@@ -51,55 +57,32 @@ class _HomeState extends State<Home> {
                         ),
                       ),
                       const Spacer(),
-                      IconButton(
-                        iconSize: 20,
-                        tooltip: "Update Available",
-                        icon: Icon(
-                          Icons.update_rounded,
-                          color: iconColor,
-                        ),
-                        onPressed: () {
-                          showAboutDialog(
-                            context: context,
-                            applicationName: 'Control Robots',
-                            applicationVersion: '1.0.0',
-                            applicationIcon: const Icon(Icons.smart_toy),
-                            children: [
-                              const Text('You are using the latest version.'),
-                            ],
-                          );
-                        },
-                      ),
-                      IconButton(
-                        iconSize: 20,
-                        tooltip: themeProvider.isDarkMode
-                            ? "Switch to Light Mode"
-                            : "Switch to Dark Mode",
-                        icon: Icon(
-                          themeProvider.isDarkMode
-                              ? Icons.dark_mode
-                              : Icons.light_mode,
-                          color: iconColor,
-                        ),
-                        onPressed: () {
-                          themeProvider.toggleTheme();
-                        },
-                      ),
+                      datetimeWidget(),
                       
                     ],
                   ),
                 ),
                 // Tabs Row + Ribbon Toggle
                 Container(
-                  height: 45,
-                  color: ribbonbarBackground,
+                  height: 36,
+                  color: themeProvider.colors.ribbonbarBackground,
                   child: Row(
                     children: [
                       const SizedBox(width: 10),
                       Consumer<ConnExplorerPanelStateProvider>(
                         builder: (context, explorerState, _) => IconButton(
-                          tooltip: "Connections",
-                          icon: Icon(Icons.add_link, color: iconColor),
+                          tooltip: explorerState.showExplorerPanel
+                              ? "Hide Connection Explorer"
+                              : "Show Connection Explorer",
+                          icon: Icon(
+                            Icons.add_link,
+                            size: 24,
+                            color: explorerState.showExplorerPanel
+                                ? themeProvider.isDarkMode
+                                    ? Colors.blue[300]
+                                    : Colors.blue[700] // Highlight color when open 
+                                : themeProvider.colors.iconColor, // Default theme color when closed
+                          ),
                           onPressed: () {
                             explorerState.toggleExplorerPanel();
                           },
@@ -115,15 +98,14 @@ class _HomeState extends State<Home> {
                           },
                           indicator: BoxDecoration(
                             color: ribbonState.showRibbon
-                                ? (tabSelected)
+                                ? (themeProvider.colors.tabSelected)
                                 : Colors.transparent,
-                            borderRadius: BorderRadius.circular(6),
                           ),
                           indicatorSize: TabBarIndicatorSize.tab,
                           labelColor: ribbonState.showRibbon
-                              ? (selectedLabelColor)
-                              : (unselectedLabelColor),
-                          unselectedLabelColor: unselectedLabelColor,
+                              ? (themeProvider.colors.selectedLabelColor)
+                              : (themeProvider.colors.unselectedLabelColor),
+                          unselectedLabelColor: themeProvider.colors.unselectedLabelColor,
                           tabs: tabs
                               .map(
                                 (name) => SizedBox(
@@ -138,12 +120,52 @@ class _HomeState extends State<Home> {
                         tooltip: ribbonState.showRibbon ? "Hide Ribbon" : "Show Ribbon",
                         icon: Icon(
                           ribbonState.showRibbon
-                              ? Icons.keyboard_arrow_up
-                              : Icons.keyboard_arrow_down,
-                          color: iconColor,
+                              ? Icons.keyboard_arrow_up_outlined
+                              : Icons.keyboard_arrow_down_outlined,
+                          color: themeProvider.colors.iconColor,
                         ),
                         onPressed: () {
                           ribbonState.toggleRibbon();
+                        },
+                      ),
+                      
+                      const SizedBox(width: 8),
+                      IconButton(
+                        alignment: Alignment.center,
+                        iconSize: 18,
+                        tooltip: "Notifications",
+                        icon: Icon(
+                          Icons.notifications,
+                          color: themeProvider.colors.iconColor,
+                        ),
+                        onPressed: () {
+                          showAboutDialog(
+                            context: context,
+                            applicationName: 'Control Robots',
+                            applicationVersion: '1.0.0',
+                            applicationIcon: const Icon(Icons.smart_toy),
+                            children: [
+                              const Text('You are using the latest version.'),
+                            ],
+                          );
+                        },
+                      ),
+                      const SizedBox(width: 8),
+                      // Theme Toggle
+                      IconButton(
+                        alignment: Alignment.center,
+                        iconSize: 18,
+                        tooltip: themeProvider.isDarkMode
+                            ? "Switch to Light Mode"
+                            : "Switch to Dark Mode",
+                        icon: Icon(
+                          themeProvider.isDarkMode
+                              ? Icons.dark_mode_outlined
+                              : Icons.light_mode_outlined,
+                          color: themeProvider.colors.iconColor,
+                        ),
+                        onPressed: () {
+                          themeProvider.toggleTheme();
                         },
                       ),
                       const SizedBox(width: 8),
@@ -152,7 +174,8 @@ class _HomeState extends State<Home> {
                 ),
                 // Ribbon content (dynamic based on selected tab)
                 if (ribbonState.showRibbon)
-                  SizedBox(
+                  Container(
+                    color: themeProvider.colors.tabSelected,
                     height: 60,
                     child: RibbonContent(selectedTab: ribbonState.selectedTab),
                   ),

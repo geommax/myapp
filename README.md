@@ -19,7 +19,10 @@ samples, guidance on mobile development, and a full API reference.
 - Connection Panel State => Connection Status (green/red) => Setting double click on RobotA,B- Wrap Container to control freely
 - study map widget style - as a free moveable layer not depend as home's widget.
 - Global App state (Cache) to get back previous state on application startup 
-- To Add menu of Ribbon Contents.
+- Toast Notification.
+- DateTime ASync
+- Notification 
+- ribbonButton - state managements.
 
 ### Troubleshoot
 
@@ -29,4 +32,14 @@ flutter config --list
 
 ```bash
 flutter config --enable-linux-desktop
+```
+#### Bundle MAP Canvaskit for releaseing app.
+```bash
+flutter build web --web-renderer canvaskit --release
+```
+#### Offline Issue
+
+```
+Error: TypeError: Failed to fetch dynamically imported module:
+https://www.gstatic.com/flutter-canvaskit/18818009497c581ede5d8a3b8b833b81d00cebb7/chromium/canvaskit.js
 ```

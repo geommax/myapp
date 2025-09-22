@@ -11,7 +11,11 @@ class ThemeProvider extends ChangeNotifier {
   }
 
   ThemeData get currentTheme {
-    return _isDarkMode ? ThemeData.dark() : ThemeData.light();
+    return (_isDarkMode ? ThemeData.dark() : ThemeData.light()).copyWith(
+      textTheme: (_isDarkMode ? ThemeData.dark().textTheme : ThemeData.light().textTheme).apply(
+        fontFamily: 'Roboto', // Use Roboto font
+      ),
+    );
   }
 
   AppColors get colors => _isDarkMode ? DarkColors() : LightColors();
@@ -28,6 +32,9 @@ abstract class AppColors {
   Color get subLabelColor;
   Color get selectedLabelColor;
   Color get unselectedLabelColor;
+
+  Color get ribbonButtonSelected;
+  Color get ribbonButtonUnselected;
 }
 
 
@@ -54,10 +61,16 @@ class DarkColors implements AppColors {
   Color get subLabelColor => Colors.white70;
 
   @override
-  Color get selectedLabelColor => Colors.black;
+  Color get selectedLabelColor => Colors.white;
 
   @override
   Color get unselectedLabelColor => Colors.white54;
+
+  @override
+  Color get ribbonButtonSelected => Colors.blueGrey[400]!;
+
+  @override
+  Color get ribbonButtonUnselected => Colors.transparent;
 
 }
 
@@ -84,10 +97,16 @@ class LightColors implements AppColors {
   Color get subLabelColor => Colors.black54;
 
   @override
-  Color get selectedLabelColor => Colors.white;
+  Color get selectedLabelColor => Colors.black;
 
   @override
   Color get unselectedLabelColor => Colors.black54;
+
+  @override
+  Color get ribbonButtonSelected => Colors.blueGrey[600]!;
+
+  @override
+  Color get ribbonButtonUnselected => Colors.transparent;
 
 }
 
