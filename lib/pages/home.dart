@@ -6,6 +6,8 @@ import '../pages/map.dart';
 import '../pages/ribbon_content.dart';
 import '../pages/conn_explorer_panel.dart';
 import '../providers/conn_explorer_provider.dart';
+import '../providers/notification_provider.dart';
+import 'notification_panel.dart';
 
 class Home extends StatefulWidget {
   const Home({super.key});
@@ -130,25 +132,23 @@ class _HomeState extends State<Home> {
                       ),
                       
                       const SizedBox(width: 8),
-                      IconButton(
-                        alignment: Alignment.center,
-                        iconSize: 18,
-                        tooltip: "Notifications",
-                        icon: Icon(
-                          Icons.notifications,
-                          color: themeProvider.colors.iconColor,
+                      Consumer<NotificationProvider>(
+                        builder: (context, notificationProvider, _) => IconButton(
+                          alignment: Alignment.center,
+                          iconSize: 18,
+                          tooltip: "Notifications",
+                          icon: Icon(
+                            Icons.notifications,
+                            color: notificationProvider.showPanel
+                                ? themeProvider.isDarkMode
+                                    ? Colors.blue[300]
+                                    : Colors.blue[700]
+                                : themeProvider.colors.iconColor,
+                          ),
+                          onPressed: () {
+                            notificationProvider.togglePanel();
+                          },
                         ),
-                        onPressed: () {
-                          showAboutDialog(
-                            context: context,
-                            applicationName: 'Control Robots',
-                            applicationVersion: '1.0.0',
-                            applicationIcon: const Icon(Icons.smart_toy),
-                            children: [
-                              const Text('You are using the latest version.'),
-                            ],
-                          );
-                        },
                       ),
                       const SizedBox(width: 8),
                       // Theme Toggle
@@ -181,19 +181,29 @@ class _HomeState extends State<Home> {
                   ),
                 // Main content: Mapping / Localization
                 Expanded(
-                  child: Row(
+                  child: Stack(
                     children: [
-                      Consumer<ConnExplorerPanelStateProvider>(
-                        builder: (context, connExplorerState, _) => Visibility(
-                          visible: connExplorerState.showExplorerPanel,
-                          child: SizedBox(
-                            width: 250,
-                            child: ConnExplorerPanel(),
+                      Row(
+                        children: [
+                          Consumer<ConnExplorerPanelStateProvider>(
+                            builder: (context, connExplorerState, _) => Visibility(
+                              visible: connExplorerState.showExplorerPanel,
+                              child: SizedBox(
+                                width: 250,
+                                child: ConnExplorerPanel(),
+                              ),
+                            ),
                           ),
-                        ),
+                          Expanded(
+                            child: MapPage(),
+                          ),
+                        ],
                       ),
-                      Expanded(
-                        child: MapPage(),
+                      const Positioned(
+                        top: 0,
+                        right: 0,
+                        bottom: 0,
+                        child: NotificationPanel(),
                       ),
                     ],
                   ),

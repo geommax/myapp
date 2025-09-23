@@ -19,9 +19,8 @@ samples, guidance on mobile development, and a full API reference.
 - Connection Panel State => Connection Status (green/red) => Setting double click on RobotA,B- Wrap Container to control freely
 - study map widget style - as a free moveable layer not depend as home's widget.
 - Global App state (Cache) to get back previous state on application startup 
-- Toast Notification.
 - DateTime ASync
-- Notification 
+- elegant_notification and 
 - ribbonButton - state managements.
 
 ### Troubleshoot
