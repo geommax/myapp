@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../providers/theme_provider.dart';
+import '../providers/notification_provider.dart';
+import '../models/notification_item.dart';
 
 class RibbonContent extends StatefulWidget {
   final int selectedTab;
@@ -36,12 +38,13 @@ class _RibbonContentState extends State<RibbonContent> {
 
   Widget _buildMappingTools() {
     // Define icons, texts, and actions
-    final icons = [Icons.map, Icons.zoom_in, Icons.layers];
-    final texts = ["Show Grid", "Zoom In", "Layers"];
+    final icons = [Icons.map, Icons.zoom_in, Icons.layers, Icons.add_alert];
+    final texts = ["Show Grid", "Zoom In", "Layers", "Add Notification"];
     final actions = [
       () => print("Show Grid pressed!"),
       () => print("Zoom In pressed!"),
       () => print("Layers pressed!"),
+      _addNotification,
     ];
 
     return Row(
@@ -59,6 +62,18 @@ class _RibbonContentState extends State<RibbonContent> {
         );
       }),
     );
+  }
+  
+  void _addNotification() {
+    final notification = NotificationItem(
+      title: 'New notification from ribbon',
+      subtitle: 'Action performed at ${DateTime.now()}',
+      timestamp: DateTime.now(),
+      icon: Icons.info,
+      iconColor: Colors.blue,
+    );
+    
+    Provider.of<NotificationProvider>(context, listen: false).addNotification(notification);
   }
   
   // Ribbon Button Widget Style
