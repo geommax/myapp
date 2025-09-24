@@ -3,35 +3,25 @@ import '../models/notification_item.dart';
 
 class NotificationProvider with ChangeNotifier {
   bool _showPanel = false;
-  final List<NotificationItem> _notifications = [
-    NotificationItem(
-      title: 'Delete VM instance "instance-20250910-173643"',
-      subtitle: 'My First Project',
-      timestamp: DateTime.now().subtract(const Duration(days: 12)),
-    ),
-    NotificationItem(
-      title:
-          'Create VM instance "instance-20250910-173643" and its boot disk "instance-20250910-173643"',
-      subtitle: 'My First Project',
-      timestamp: DateTime.now().subtract(const Duration(days: 12)),
-    ),
-    NotificationItem(
-      title: 'Delete firewall rule "shadowsocks-rule"',
-      subtitle: 'My First Project',
-      timestamp: DateTime.now().subtract(const Duration(days: 13)),
-    ),
-  ];
+  int _unreadCount = 0;
+  int get unreadCount => _unreadCount;
+
+  final List<NotificationItem> _notifications = [];
 
   bool get showPanel => _showPanel;
   List<NotificationItem> get notifications => _notifications;
 
   void togglePanel() {
     _showPanel = !_showPanel;
+    if (_showPanel) {
+      _unreadCount = 0;
+    }
     notifyListeners();
   }
 
   void addNotification(NotificationItem notification) {
     _notifications.insert(0, notification);
+    _unreadCount++;
     notifyListeners();
   }
 }

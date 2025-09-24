@@ -132,23 +132,62 @@ class _HomeState extends State<Home> {
                       ),
                       
                       const SizedBox(width: 8),
+                      // ...existing code...
                       Consumer<NotificationProvider>(
-                        builder: (context, notificationProvider, _) => IconButton(
-                          alignment: Alignment.center,
-                          iconSize: 18,
-                          tooltip: "Notifications",
-                          icon: Icon(
-                            Icons.notifications,
-                            color: notificationProvider.showPanel
-                                ? themeProvider.isDarkMode
-                                    ? Colors.blue[300]
-                                    : Colors.blue[700]
-                                : themeProvider.colors.iconColor,
-                          ),
-                          onPressed: () {
-                            notificationProvider.togglePanel();
-                          },
-                        ),
+                        builder: (context, notificationProvider, _) =>
+                            GestureDetector(
+                              behavior: HitTestBehavior.translucent,
+                              onTap: () {
+                                notificationProvider.togglePanel();
+                              },
+                              child: Stack(
+                                children: [
+                                  IconButton(
+                                    alignment: Alignment.center,
+                                    iconSize: 20,
+                                    tooltip: "Notifications",
+                                    icon: Icon(
+                                      Icons.notifications,
+                                      color: notificationProvider.showPanel
+                                          ? themeProvider.isDarkMode
+                                                ? Colors.blue[300]
+                                                : Colors.blue[700]
+                                          : themeProvider.colors.iconColor,
+                                    ),
+                                    onPressed: () {
+                                      notificationProvider.togglePanel();
+                                    },
+                                  ),
+                                  if (notificationProvider.unreadCount > 0)
+                                    Positioned(
+                                      right: 6,
+                                      top: 6,
+                                      child: Container(
+                                        padding: const EdgeInsets.all(2),
+                                        decoration: BoxDecoration(
+                                          color: Colors.red,
+                                          borderRadius: BorderRadius.circular(
+                                            8,
+                                          ),
+                                        ),
+                                        constraints: const BoxConstraints(
+                                          minWidth: 16,
+                                          minHeight: 16,
+                                        ),
+                                        child: Text(
+                                          '${notificationProvider.unreadCount}',
+                                          style: const TextStyle(
+                                            color: Colors.white,
+                                            fontSize: 10,
+                                            fontWeight: FontWeight.bold,
+                                          ),
+                                          textAlign: TextAlign.center,
+                                        ),
+                                      ),
+                                    ),
+                                ],
+                              ),
+                            ),
                       ),
                       const SizedBox(width: 8),
                       // Theme Toggle

@@ -3,6 +3,7 @@ import 'package:provider/provider.dart';
 import '../providers/theme_provider.dart';
 import '../providers/notification_provider.dart';
 import '../models/notification_item.dart';
+import '../pages/notification_panel.dart';
 
 class RibbonContent extends StatefulWidget {
   final int selectedTab;
@@ -64,6 +65,9 @@ class _RibbonContentState extends State<RibbonContent> {
     );
   }
   
+
+  // can be used from another threads
+  // can be used from another threads
   void _addNotification() {
     final notification = NotificationItem(
       title: 'New notification from ribbon',
@@ -72,10 +76,20 @@ class _RibbonContentState extends State<RibbonContent> {
       icon: Icons.info,
       iconColor: Colors.blue,
     );
-    
+
     Provider.of<NotificationProvider>(context, listen: false).addNotification(notification);
+
+    showNotificationPopover(
+      context,
+      title: notification.title,
+      icon: notification.icon,
+      iconColor: notification.iconColor,
+      textColor: Colors.white,
+    );
   }
-  
+  // can be used from another threads
+  // can be used from another threads
+
   // Ribbon Button Widget Style
   Widget _buildRibbonButton({
     required IconData icon,
