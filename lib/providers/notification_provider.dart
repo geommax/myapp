@@ -12,10 +12,11 @@ class NotificationProvider with ChangeNotifier {
   List<NotificationItem> get notifications => _notifications;
 
   void togglePanel() {
-    _showPanel = !_showPanel;
-    if (_showPanel) {
+     //unused variable
+    // _showPanel = !_showPanel;
+    
       _unreadCount = 0;
-    }
+   
     notifyListeners();
   }
 
